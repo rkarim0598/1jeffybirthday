@@ -1,0 +1,225 @@
+<html>
+    <head>
+        <title>1JeffyBirthday</title>
+        <meta charset="UTF-8">
+        <meta name="description" content="A useless website">
+        <meta name="keywords" content="1JeffyBirthday">
+        <meta name="author" content="Rayyan Karim">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src='gifshot.js'></script>
+    </head>
+    <body>
+        <div id='overlay'>
+            <div id='full-progress-bar'>
+                <div id='partial-progress-bar'></div>
+            </div>
+        </div>
+        <form id='main-content'>
+            <h1>Welcome</h1>
+            <div>
+                <label for="mode">Mode:</label>
+                <select
+                    id="mode"
+                    name="mode"
+                    value='birthday'
+                    onchange='updateTextLabel()'
+                >
+                    <option value='birthday'>Birthday</option>
+                    <option value='custom'>Custom</option>
+                </select>
+            </div>
+            <div>
+                <label for="size">Font Size:</label>
+                <input
+                    type="number"
+                    id="size"
+                    name="size"
+                    value=22
+                    placeholder="Font Size"
+                    required
+                >
+            </div>
+            <div>
+                <label id='text-label' for="text">Name:</label>
+                <input
+                    type="text"
+                    id="text"
+                    name="text"
+                    placeholder="Type your thing here"
+                    required
+                >
+            </div>
+            <button type='submit'>Create</button>
+            <img
+                id='there'
+                height='300'
+                width='500'
+                onclick="downloadImage()"
+            >
+            <span></span>
+        </form>
+    </body>
+    <script>
+        window.onload = () => {
+            document.getElementById('main-content')
+                .addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    doTheThing();
+                })
+        }
+
+        const formattedNum = (index) => index.toString().length === 1 ? `00${index}` : `0${index}`
+
+        const doTheThing = () => {
+            // show the overlay
+            let overlay = document.getElementById('overlay')
+            overlay.style = 'display: flex'
+            
+            // initialize progress
+            let progress = document.getElementById('partial-progress-bar')
+            progress.style.width = '0%';
+
+            const mode = document.getElementById('mode').value
+            const fontSize = parseInt(document.getElementById('size').value)
+            const text = document.getElementById('text').value
+
+            const imgs = [...Array(63)].map((_, index) => {
+                let baseObj = {
+                    src: `images/jeffy-${index}.jpg`
+                }
+
+                if (index > 41) {
+                    baseObj.text = mode === 'birthday' ?
+                        `IT'S ${text.toUpperCase()}'S BIRTHDAY, MY DUDES!!!` :
+                        text
+                }
+
+                return baseObj
+            })
+
+            gifshot.createGIF({
+                gifWidth: 500,
+                gifHeight: 300,
+                'images': imgs,
+                interval: 0.07,
+                fontWeight: 'bold',
+                resizeFont: true,
+                fontSize: `${fontSize}px`,
+                progressCallback: (captureProgress) => {
+                    progress.style.width = `${captureProgress * 100}%`
+                },
+            }, obj => {
+                if (!obj.error) {
+                    let img = document.getElementById('there')
+                    img.style.display = 'flex'
+                    img.src = obj.image
+                    overlay.style = 'display:none'
+                    document.getElementsByTagName('h1')[0].innerText = 'Well, there it is'
+                    
+                    let downloadText = document.getElementsByTagName('span')[0]
+                    downloadText.innerText = 'Click image to download'
+                    downloadText.style.fontSize = '20px'
+                }
+            })
+        }
+        
+        const downloadImage = () => {
+            const source = document.getElementById('there').src
+            
+            let anchor = document.createElement('a')
+            anchor.setAttribute('href', source)
+            anchor.setAttribute('download', document.getElementById('mode').value === 'birthday' ?
+                `${document.getElementById('text').value}-jeffy-bday.gif` :
+                '1jeffymessage.gif'
+            )
+            anchor.click()
+        }
+
+        const updateTextLabel = () => {
+            document.getElementById('text-label').innerText = 
+                document.getElementById('mode').value === 'birthday' ?
+                    'Name:' :
+                    'Custom Text:'
+                
+        }
+    </script>
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+            background-color: rgba(80, 80, 80);
+            color: white;
+        }
+        
+        #main-content {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #main-content > h1 {
+            font-size: 35px;
+        }
+
+        #main-content > div {
+            font-size: 20px;
+        }
+
+        #main-content > button {
+            width: 8rem;
+            height: 3rem;
+        }
+
+        #main-content > div,
+        #main-content > h1 {
+            margin-bottom: 3rem;
+        }
+
+        #main-content > button {
+            margin-bottom: 2rem;
+        }
+        
+        #main-content > img {
+            border-radius: 1rem;
+            display: none;
+            max-width: 90%;
+        }
+
+        #overlay {
+            position: absolute;
+            z-index: 10;
+            display: none;
+            height: 100%;
+            width: 100%;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            
+        }
+
+        #full-progress-bar {
+            height: 2%;
+            width: 60%;
+            border-radius: 3rem;
+            background-color: gray;
+        }
+
+        #partial-progress-bar {
+            height: 100%;
+            border-radius: 3rem;
+            background-color: white;
+        }
+    </style>
+</html>
